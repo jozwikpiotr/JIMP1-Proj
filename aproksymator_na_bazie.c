@@ -157,8 +157,13 @@ make_spl(points_t * pts, spline_t * spl)
 
 	if( nbEnv != NULL && atoi( nbEnv ) > 0 )
 		nb = atoi( nbEnv );
-
+	//------------------------//
+	gsl_eqs = gsl_matrix_alloc (nb, nb);
+	gsl_v_b = gsl_vector_calloc(nb);
+	gsl_v_x = gsl_vector_calloc(nb);
+	//
 	eqs = make_matrix(nb, nb + 1);
+	//--------------------------//
 
 #ifdef DEBUG
 #define TESTBASE 500
