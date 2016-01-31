@@ -64,7 +64,14 @@ make_spl (points_t * pts, spline_t * spl)
 	}
 
 #ifdef DEBUG
-	write_matrix( eqs, stdout );
+	{
+		//-----------------------//
+		//gsl_matrix_fprintf(stdout, gsl_eqs, "%.0lf");
+		gsl_vector_fprintf(stdout, gsl_v_b, "%.0lf");
+		//
+		/*write_matrix( eqs, stdout );*/
+		//-----------------------//
+	}
 #endif
 
 	//-----------------------//
@@ -79,7 +86,14 @@ make_spl (points_t * pts, spline_t * spl)
 
 
 #ifdef DEBUG
-	write_matrix( eqs, stdout );
+	{
+		//----------------------//
+		//gsl_matrix_fprintf(stdout, gsl_eqs, "%lf");
+		gsl_vector_fprintf(stdout, gsl_v_x, "%.5lf");
+		//
+		/*write_matrix( eqs, stdout );*/
+		//----------------------//
+	}
 #endif
 
   if ( alloc_spl (spl, pts->n) == 0 ) {
