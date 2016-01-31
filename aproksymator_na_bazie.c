@@ -212,7 +212,12 @@ make_spl(points_t * pts, spline_t * spl)
 	}
 	
 #ifdef DEBUG
+	//--------------------//
+	gsl_vector_fprintf (stdout, gsl_v_b, "%.5lf");
+	putchar('\n');
+	//
 	write_matrix(eqs, stdout);
+	//-------------------//
 #endif
 
 	//------------------------//
@@ -226,7 +231,12 @@ make_spl(points_t * pts, spline_t * spl)
 	//-----------------------//
 	
 #ifdef DEBUG
+	//-----------------------//
+	gsl_vector_fprintf (stdout, gsl_v_x, "%.5lf");
+	putchar('\n');
+	//
 	write_matrix(eqs, stdout);
+	//-----------------------//
 #endif
 
 	if (alloc_spl(spl, nb) == 0) {
@@ -262,10 +272,17 @@ make_spl(points_t * pts, spline_t * spl)
 			double d3yi= 0;
 			double xi= a + i * dx;
 			for( k= 0; k < nb; k++ ) {
-							yi += get_entry_matrix(eqs, k, nb) * fi(a, b, nb, k, xi);
+							//------------------------//
+							yi += gsl_vector_get(gsl_v_x, k) * fi(a, b, nb, k, xi);
+							dyi += gsl_vector_get(gsl_v_x, k) * dfi(a, b, nb, k, xi);
+							d2yi += gsl_vector_get(gsl_v_x, k) * d2fi(a, b, nb, k, xi);
+							d3yi += gsl_vector_get(gsl_v_x, k) * d3fi(a, b, nb, k, xi);
+							//
+							/*yi += get_entry_matrix(eqs, k, nb) * fi(a, b, nb, k, xi);
 							dyi += get_entry_matrix(eqs, k, nb) * dfi(a, b, nb, k, xi);
 							d2yi += get_entry_matrix(eqs, k, nb) * d2fi(a, b, nb, k, xi);
-							d3yi += get_entry_matrix(eqs, k, nb) * d3fi(a, b, nb, k, xi);
+							d3yi += get_entry_matrix(eqs, k, nb) * d3fi(a, b, nb, k, xi);*/
+							//------------------------//
 			}
 			fprintf(tst, "%g %g %g %g %g\n", xi, yi, dyi, d2yi, d3yi );
 		}
