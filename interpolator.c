@@ -11,7 +11,13 @@ make_spl (points_t * pts, spline_t * spl)
 {
 
 	int n= pts->n - 1;
-	matrix_t *eqs= make_matrix( n*3, n*3+1 );
+	//--------------------//
+	gsl_matrix * gsl_eqs = gsl_matrix_calloc(n*3,n*3);
+	gsl_vector * gsl_v_b = gsl_vector_calloc(n*3);
+	gsl_vector * gsl_v_x = gsl_vector_calloc(n*3);
+	//
+	/*matrix_t *eqs= make_matrix( n*3, n*3+1 );*/
+	//-------------------//
 	double *x = pts->x;
 	double *y = pts->y;
 
