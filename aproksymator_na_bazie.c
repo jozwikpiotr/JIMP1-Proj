@@ -1,6 +1,9 @@
 #include "makespl.h"
 #include "piv_ge_solver.h"
 
+#include <gsl/gsl_linalg.h>
+#include <gsl/gsl_matrix.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <float.h>
