@@ -87,9 +87,15 @@ make_spl (points_t * pts, spline_t * spl)
 		for( i= 0; i < n; i++ ) {
 			spl->x[i]= pts->x[i];
 			spl->f[i]= pts->y[i];
-			spl->f1[i]= get_entry_matrix( eqs, 3*i,   3*n );
+			//-------------------//
+			spl->f1[i]= gsl_vector_get( gsl_v_x, 3*i);
+			spl->f2[i]= gsl_vector_get( gsl_v_x, 3*i+1);
+			spl->f3[i]= gsl_vector_get( gsl_v_x, 3*i+2);
+			//
+			/*spl->f1[i]= get_entry_matrix( eqs, 3*i,   3*n );
 			spl->f2[i]= get_entry_matrix( eqs, 3*i+1, 3*n );
-			spl->f3[i]= get_entry_matrix( eqs, 3*i+2, 3*n );
+			spl->f3[i]= get_entry_matrix( eqs, 3*i+2, 3*n );*/
+			//-------------------//
 		}
 		spl->x[n]= pts->x[n];
 		spl->f[n]= pts->y[n];
