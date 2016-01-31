@@ -67,10 +67,16 @@ make_spl (points_t * pts, spline_t * spl)
 	write_matrix( eqs, stdout );
 #endif
 
-	if( piv_ge_solver( eqs ) ) {
+	//-----------------------//
+	gsl_linalg_cholesky_decomp(gsl_eqs)
+	gsl_linalg_cholesky_solve(gsl_eqs, gsl_v_b, gsl_v_x);
+	//
+	/*if( piv_ge_solver( eqs ) ) {
 		spl->n = 0;
 		return;
-	}
+	}*/
+	//----------------------//
+
 
 #ifdef DEBUG
 	write_matrix( eqs, stdout );
