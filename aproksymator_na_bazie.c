@@ -186,15 +186,31 @@ make_spl(points_t * pts, spline_t * spl)
 	}
 #endif
 
+	double matr_val;
 	for (j = 0; j < nb; j++) {
 		for (i = 0; i < nb; i++)
+		{
 			for (k = 0; k < pts->n; k++)
+			{
+				//------------------------//
+				matr_val = gsl_matrix_get (gsl_eqs, j, i);
+				gsl_matrix_set (gsl_eqs, j, i, fi(a, b, nb, i, x[k]) * fi(a, b, nb, j, x[k]) + matr_val);
+				//
 				add_to_entry_matrix(eqs, j, i, fi(a, b, nb, i, x[k]) * fi(a, b, nb, j, x[k]));
-
+				//------------------------//
+			}
+		}
 		for (k = 0; k < pts->n; k++)
+		{
+			//--------------------------//
+			matr_val = gsl_vector_get (gsl_v_b, j);
+			gsl_vector_set (gsl_v_b, j, y[k] * fi(a, b, nb, j, x[k]) + matr_val);
+			//
 			add_to_entry_matrix(eqs, j, nb, y[k] * fi(a, b, nb, j, x[k]));
+			//--------------------------//
+		}
 	}
-
+	
 #ifdef DEBUG
 	write_matrix(eqs, stdout);
 #endif
