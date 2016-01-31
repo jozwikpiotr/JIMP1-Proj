@@ -238,7 +238,11 @@ make_spl(points_t * pts, spline_t * spl)
 			spl->f2[i] = 0;
 			spl->f3[i] = 0;
 			for (k = 0; k < nb; k++) {
-				double		ck = get_entry_matrix(eqs, k, nb);
+				//-----------------------//
+				double 		ck = gsl_vector_get (gsl_v_x, k);
+				//
+				/*double		ck = get_entry_matrix(eqs, k, nb)*/
+				//-----------------------//
 				spl->f[i]  += ck * fi  (a, b, nb, k, xx);
 				spl->f1[i] += ck * dfi (a, b, nb, k, xx);
 				spl->f2[i] += ck * d2fi(a, b, nb, k, xx);
