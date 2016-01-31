@@ -1,6 +1,9 @@
 #include "makespl.h"
 #include "piv_ge_solver.h"
 
+#include <gsl/gsl_linalg.h>
+#include <gsl/gsl_matrix.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <float.h>
@@ -137,8 +140,13 @@ xfi(double a, double b, int n, int i, FILE *out)
 void
 make_spl(points_t * pts, spline_t * spl)
 {
-
+	//---------------------------//
+	gsl_matrix  * gsl_eqs = NULL;
+	gsl_vector * gsl_v_b = NULL;
+	gsl_vector * gsl_v_x = NULL;
+	//
 	matrix_t       *eqs= NULL;
+	//--------------------------//
 	double         *x = pts->x;
 	double         *y = pts->y;
 	double		a = x[0];
@@ -149,8 +157,13 @@ make_spl(points_t * pts, spline_t * spl)
 
 	if( nbEnv != NULL && atoi( nbEnv ) > 0 )
 		nb = atoi( nbEnv );
-
+	//------------------------//
+	gsl_eqs = gsl_matrix_alloc (nb, nb);
+	gsl_v_b = gsl_vector_calloc(nb);
+	gsl_v_x = gsl_vector_calloc(nb);
+	//
 	eqs = make_matrix(nb, nb + 1);
+	//--------------------------//
 
 #ifdef DEBUG
 #define TESTBASE 500
@@ -173,25 +186,57 @@ make_spl(points_t * pts, spline_t * spl)
 	}
 #endif
 
+	double matr_val;
 	for (j = 0; j < nb; j++) {
 		for (i = 0; i < nb; i++)
+		{
 			for (k = 0; k < pts->n; k++)
+			{
+				//------------------------//
+				matr_val = gsl_matrix_get (gsl_eqs, j, i);
+				gsl_matrix_set (gsl_eqs, j, i, fi(a, b, nb, i, x[k]) * fi(a, b, nb, j, x[k]) + matr_val);
+				//
 				add_to_entry_matrix(eqs, j, i, fi(a, b, nb, i, x[k]) * fi(a, b, nb, j, x[k]));
-
+				//------------------------//
+			}
+		}
 		for (k = 0; k < pts->n; k++)
+		{
+			//--------------------------//
+			matr_val = gsl_vector_get (gsl_v_b, j);
+			gsl_vector_set (gsl_v_b, j, y[k] * fi(a, b, nb, j, x[k]) + matr_val);
+			//
 			add_to_entry_matrix(eqs, j, nb, y[k] * fi(a, b, nb, j, x[k]));
+			//--------------------------//
+		}
 	}
-
+	
 #ifdef DEBUG
+	//--------------------//
+	gsl_vector_fprintf (stdout, gsl_v_b, "%.5lf");
+	putchar('\n');
+	//
 	write_matrix(eqs, stdout);
+	//-------------------//
 #endif
 
+	//------------------------//
+	gsl_linalg_cholesky_decomp(gsl_eqs);
+	gsl_linalg_cholesky_solve(gsl_eqs, gsl_v_b, gsl_v_x);
+	//
 	if (piv_ge_solver(eqs)) {
 		spl->n = 0;
 		return;
 	}
+	//-----------------------//
+	
 #ifdef DEBUG
+	//-----------------------//
+	gsl_vector_fprintf (stdout, gsl_v_x, "%.5lf");
+	putchar('\n');
+	//
 	write_matrix(eqs, stdout);
+	//-----------------------//
 #endif
 
 	if (alloc_spl(spl, nb) == 0) {
@@ -203,7 +248,11 @@ make_spl(points_t * pts, spline_t * spl)
 			spl->f2[i] = 0;
 			spl->f3[i] = 0;
 			for (k = 0; k < nb; k++) {
-				double		ck = get_entry_matrix(eqs, k, nb);
+				//-----------------------//
+				double 		ck = gsl_vector_get (gsl_v_x, k);
+				//
+				/*double		ck = get_entry_matrix(eqs, k, nb)*/
+				//-----------------------//
 				spl->f[i]  += ck * fi  (a, b, nb, k, xx);
 				spl->f1[i] += ck * dfi (a, b, nb, k, xx);
 				spl->f2[i] += ck * d2fi(a, b, nb, k, xx);
@@ -223,10 +272,17 @@ make_spl(points_t * pts, spline_t * spl)
 			double d3yi= 0;
 			double xi= a + i * dx;
 			for( k= 0; k < nb; k++ ) {
-							yi += get_entry_matrix(eqs, k, nb) * fi(a, b, nb, k, xi);
+							//------------------------//
+							yi += gsl_vector_get(gsl_v_x, k) * fi(a, b, nb, k, xi);
+							dyi += gsl_vector_get(gsl_v_x, k) * dfi(a, b, nb, k, xi);
+							d2yi += gsl_vector_get(gsl_v_x, k) * d2fi(a, b, nb, k, xi);
+							d3yi += gsl_vector_get(gsl_v_x, k) * d3fi(a, b, nb, k, xi);
+							//
+							/*yi += get_entry_matrix(eqs, k, nb) * fi(a, b, nb, k, xi);
 							dyi += get_entry_matrix(eqs, k, nb) * dfi(a, b, nb, k, xi);
 							d2yi += get_entry_matrix(eqs, k, nb) * d2fi(a, b, nb, k, xi);
-							d3yi += get_entry_matrix(eqs, k, nb) * d3fi(a, b, nb, k, xi);
+							d3yi += get_entry_matrix(eqs, k, nb) * d3fi(a, b, nb, k, xi);*/
+							//------------------------//
 			}
 			fprintf(tst, "%g %g %g %g %g\n", xi, yi, dyi, d2yi, d3yi );
 		}
