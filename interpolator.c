@@ -28,7 +28,24 @@ make_spl (points_t * pts, spline_t * spl)
 		int if1= 3*i;
 		int if2= if1+1;
 		int if3= if2+1;
-		put_entry_matrix( eqs, if1, if1, dx );
+		//-----------------//
+		gsl_matrix_set( gsl_eqs, if1, if1, dx );
+		gsl_matrix_set( gsl_eqs, if1, if2, dx*dx/2 );
+		gsl_matrix_set( gsl_eqs, if1, if3, dx*dx*dx/6 );
+		gsl_vector_set( gsl_v_b, if1, y[i+1]-y[i] );
+		gsl_matrix_set( gsl_eqs, if2, if1, 1 );
+		gsl_matrix_set( gsl_eqs, if2, if2, dx );
+		gsl_matrix_set( gsl_eqs, if2, if3, dx*dx/2 );
+		if( if3+1 < n*3 )
+			gsl_matrix_set( gsl_eqs, if2, if3+1, -1 );
+		else
+			gsl_matrix_set( gsl_eqs, if2, if1, 0 );
+		gsl_matrix_set( gsl_eqs, if3, if2, 1 );
+		gsl_matrix_set( gsl_eqs, if3, if3, dx );
+		if( if3+2 < n*3 )
+			gsl_matrix_set( gsl_eqs, if3, if3+2, -1 );
+		//
+		/*put_entry_matrix( eqs, if1, if1, dx );
 		put_entry_matrix( eqs, if1, if2, dx*dx/2 );
 		put_entry_matrix( eqs, if1, if3, dx*dx*dx/6 );
 		put_entry_matrix( eqs, if1, n*3, y[i+1]-y[i] );
@@ -42,7 +59,8 @@ make_spl (points_t * pts, spline_t * spl)
 		put_entry_matrix( eqs, if3, if2, 1 );
 		put_entry_matrix( eqs, if3, if3, dx );
 		if( if3+2 < n*3 )
-			put_entry_matrix( eqs, if3, if3+2, -1 );
+			put_entry_matrix( eqs, if3, if3+2, -1 );*/
+		//--------------------//
 	}
 
 #ifdef DEBUG
