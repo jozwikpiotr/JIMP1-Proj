@@ -140,8 +140,13 @@ xfi(double a, double b, int n, int i, FILE *out)
 void
 make_spl(points_t * pts, spline_t * spl)
 {
-
+	//---------------------------//
+	gsl_matrix  * gsl_eqs = NULL;
+	gsl_vector * gsl_v_b = NULL;
+	gsl_vector * gsl_v_x = NULL;
+	//
 	matrix_t       *eqs= NULL;
+	//--------------------------//
 	double         *x = pts->x;
 	double         *y = pts->y;
 	double		a = x[0];
